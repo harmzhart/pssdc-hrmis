@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import staffRoutes from "./routes/staffRoutes.js";
+import importRoutes from "./routes/importRoutes.js";
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/staff", staffRoutes);
+app.use("/api/import", importRoutes);
 
 // Test route
 app.get("/", (req, res) => {
