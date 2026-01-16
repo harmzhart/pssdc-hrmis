@@ -11,3 +11,19 @@ export const fetchStaffById = async (id) => {
   if (!response.ok) throw new Error("Failed to fetch staff");
   return response.json();
 };
+
+export const updateStaff = async (id, data) => {
+  const response = await fetch(`${API_URL}/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to update staff");
+  }
+
+  return response.json();
+};
