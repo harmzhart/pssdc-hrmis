@@ -1,3 +1,7 @@
+import { Routes, Route } from "react-router-dom";
+import StaffList from "./pages/StaffList";
+import StaffProfile from "./pages/StaffProfile";
+
 function App() {
   return (
     <div className="min-h-screen">
@@ -8,9 +12,10 @@ function App() {
       </header>
 
       <main className="p-6">
-        <p className="text-gray-600">
-          Staff Management Dashboard
-        </p>
+        <Routes>
+          <Route path="/" element={<StaffList />} />
+          <Route path="/staff/:id" element={<StaffProfile />} />
+        </Routes>
       </main>
     </div>
   );
