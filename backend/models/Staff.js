@@ -2,127 +2,165 @@ import mongoose from "mongoose";
 
 const staffSchema = new mongoose.Schema(
   {
-    // =========================
+    // ======================
     // PERSONAL INFORMATION
-    // =========================
+    // ======================
+    firstName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    lastName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    middleName: {
+      type: String,
+      trim: true,
+    },
+    dateOfBirth: {
+      type: Date,
+    },
+    gender: {
+      type: String,
+      enum: ["Male", "Female"],
+    },
+    maritalStatus: {
+      type: String,
+      enum: ["Single", "Married", "Divorced", "Widowed"],
+    },
+    passportPhoto: {
+      type: String, // Cloudinary URL
+    },
+
+    // ======================
+    // EMPLOYMENT DETAILS
+    // ======================
     staffId: {
       type: String,
       required: true,
       unique: true,
       trim: true,
     },
-
-    firstName: {
+    officialEmail: {
       type: String,
       required: true,
+      lowercase: true,
       trim: true,
     },
-
-    lastName: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-
-    otherNames: {
-      type: String,
-      trim: true,
-    },
-
-    gender: {
-      type: String,
-      enum: ["Male", "Female"],
-    },
-
-    dateOfBirth: {
-      type: Date,
-    },
-
-    maritalStatus: {
-      type: String,
-    },
-
-    // =========================
-    // EMPLOYMENT INFORMATION
-    // =========================
     department: {
       type: String,
       required: true,
     },
-
     unit: {
       type: String,
     },
-
+    jobTitle: {
+      type: String,
+    },
     designation: {
       type: String,
     },
-
     gradeLevel: {
       type: String,
     },
-
     step: {
       type: String,
     },
-
     employmentType: {
       type: String,
-      enum: ["Permanent", "Contract", "Temporary"],
-      default: "Permanent",
+      enum: ["Permanent", "Temporary", "Fixed-Term Contract", "Expatriate", "Others"],
     },
-
+    previousEmployment: {
+      type: String,
+    },
     dateOfFirstAppointment: {
       type: Date,
     },
-
-    dateOfConfirmation: {
+    confirmationDate: {
+      type: Date,
+    },
+    lastPromotionDate: {
+      type: Date,
+    },
+    nextPromotionEligibilityDate: {
       type: Date,
     },
 
-    currentPosting: {
-      type: String,
-    },
-
-    // =========================
-    // CONTACT INFORMATION
-    // =========================
-    phoneNumber: {
-      type: String,
-    },
-
-    email: {
+    // ======================
+    // CONTACT DETAILS
+    // ======================
+    alternativeEmail: {
       type: String,
       lowercase: true,
       trim: true,
     },
-
+    phoneNumber: {
+      type: String,
+    },
     residentialAddress: {
       type: String,
     },
-
-    // =========================
-    // IMAGE & DOCUMENTS
-    // =========================
-    profileImage: {
-      type: String, // Cloudinary or image URL later
-    },
-
-    // =========================
-    // SYSTEM STATUS
-    // =========================
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
-
-    remarks: {
+    residentialLGA: {
       type: String,
     },
+
+    // ======================
+    // NEXT OF KIN
+    // ======================
+    nextOfKin: {
+      name: String,
+      relationship: String,
+      phoneNumber: String,
+      address: String,
+    },
+
+    // ======================
+    // EDUCATION & TRAINING
+    // ======================
+    education: {
+      academicQualification: String,
+      institution: String,
+      yearOfGraduation: String,
+    },
+    professionalAssociations: [
+      {
+        type: String,
+      },
+    ],
+    recentTrainings: [
+      {
+        type: String,
+      },
+    ],
+
+    // ======================
+    // DOCUMENT UPLOADS
+    // ======================
+    documents: {
+      appointmentLetter: String,
+      confirmationLetter: String,
+    },
+
+    // ======================
+    // STAFF STATUS
+    // ======================
+    status: {
+      type: String,
+      enum: [
+        "Active",
+        "On Leave",
+        "Retired",
+        "Suspended",
+        "Seconded",
+        "Deceased",
+        "Deactivated",
+      ],
+      default: "Active",
+    },
   },
-  {
-    timestamps: true, // createdAt & updatedAt
-  }
+  { timestamps: true }
 );
 
 const Staff = mongoose.model("Staff", staffSchema);

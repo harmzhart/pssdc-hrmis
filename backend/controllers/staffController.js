@@ -23,10 +23,42 @@ export const createStaff = async (req, res) => {
 // ==========================
 export const getAllStaff = async (req, res) => {
   try {
-    const staff = await Staff.find().sort({ createdAt: -1 });
+    const {
+      search,
+      department,
+      status,
+      gradeLevel,
+      sortBy = "lastName",
+      order = "asc",
+    } = req.query;
+
+    let query = {};
+
+    // 🔍 SEARCH (Name, Staff ID, Email)
+    if (search) {
+      query.$or = [
+        { firstName: { $regex: search, $options: "i" } },
+        { lastName: { $regex: search, $options: "i" } },
+        { staffId: { $regex: search, $options: "i" } },
+        { officialEmail: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // 🎯 FILTERS
+    if (department) query.department = department;
+    if (status) query.status = status;
+    if (gradeLevel) query.gradeLevel = gradeLevel;
+
+    // 🔃 SORT
+    const sortOrder = order === "desc" ? -1 : 1;
+    const sortOptions = { [sortBy]: sortOrder };
+
+    const staff = await Staff.find(query)
+      .sort(sortOptions)
+
     res.status(200).json(staff);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: "Failed to fetch staff", error });
   }
 };
 
@@ -43,7 +75,7 @@ export const getStaffById = async (req, res) => {
 
     res.status(200).json(staff);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: "Failed to fetch staff", error });
   }
 };
 
@@ -52,21 +84,19 @@ export const getStaffById = async (req, res) => {
 // ==========================
 export const updateStaff = async (req, res) => {
   try {
-    const staff = await Staff.findById(req.params.id);
-
-    if (!staff) {
-      return res.status(404).json({ message: "Staff not found" });
-    }
-
     const updatedStaff = await Staff.findByIdAndUpdate(
       req.params.id,
       req.body,
-      { new: true }
+      { new: true, runValidators: true }
     );
+
+    if (!updatedStaff) {
+      return res.status(404).json({ message: "Staff not found" });
+    }
 
     res.status(200).json(updatedStaff);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(400).json({ message: "Failed to update staff", error });
   }
 };
 
@@ -81,7 +111,7 @@ export const deactivateStaff = async (req, res) => {
       return res.status(404).json({ message: "Staff not found" });
     }
 
-    staff.isActive = false;
+    staff.status = "Deactivated";
     await staff.save();
 
     res.status(200).json({ message: "Staff deactivated successfully" });
