@@ -73,7 +73,7 @@ function StaffTable({ staff }) {
 
                 {/* STICKY NAME CELL */}
                 <td
-                  className="p-3 sticky left-0 z-20 bg-white font-medium"
+                  className="p-3 sticky left-0 z-20 bg-white font-medium hover:bg-gray-100"
                   style={{ width: NAME_WIDTH }}
                 >
                   {person.lastName} {person.firstName}

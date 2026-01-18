@@ -98,6 +98,10 @@ function StaffProfile({ isAdmin = true }) {
               <ProfileItem label="Date of Birth" value={formatDate(staff.dateOfBirth)} />
               <ProfileItem label="Gender" value={staff.gender || "-"} />
               <ProfileItem label="Marital Status" value={staff.maritalStatus || "-"} />
+              <ProfileItem label="Nationality" value={staff.nationality || "-"} />
+              <ProfileItem label="State of Origin" value={staff.stateOfOrigin || "-"} />
+              <ProfileItem label="Religion" value={staff.religion || "-"} />
+              <ProfileItem label="Disability" value={staff.disability || "-"} />
             </ProfileGrid>
           </Section>
 
@@ -115,8 +119,13 @@ function StaffProfile({ isAdmin = true }) {
           {/* Employment Information */}
           <Section title="Employment Information">
             <ProfileGrid>
+              <ProfileItem label="Department" value={staff.department || "-"} />
+              <ProfileItem label="Unit" value={staff.unit || "-"} />
+              <ProfileItem label="Job Title" value={staff.jobTitle || "-"} />
+              <ProfileItem label="Designation" value={staff.designation || "-"} />
               <ProfileItem label="Grade" value={staff.gradeLevel || "-"} />
               <ProfileItem label="Step" value={staff.step || "-"} />
+              <ProfileItem label="Previous Employment" value={staff.previousEmployment || "-"} />
               <ProfileItem label="Date of First Appointment" value={formatDate(staff.dateOfFirstAppointment)} />
               <ProfileItem label="Confirmation Date" value={formatDate(staff.confirmationDate)} />
               <ProfileItem label="Last Promotion" value={formatDate(staff.lastPromotionDate)} />
@@ -146,17 +155,6 @@ function StaffProfile({ isAdmin = true }) {
             </ProfileGrid>
           </Section>
 
-          {/* Documents */}
-          <Section title="Documents">
-            <div className="flex flex-wrap gap-4">
-              {staff.documents?.appointmentLetter && (
-                <DocumentButton url={staff.documents.appointmentLetter} label="View Appointment Letter" />
-              )}
-              {staff.documents?.confirmationLetter && (
-                <DocumentButton url={staff.documents.confirmationLetter} label="View Confirmation Letter" />
-              )}
-            </div>
-          </Section>
         </div>
       )}
     </div>

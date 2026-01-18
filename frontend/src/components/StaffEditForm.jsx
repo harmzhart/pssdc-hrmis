@@ -2,6 +2,7 @@ import { useState } from "react";
 
 function StaffEditForm({ staff = {}, onSave, onCancel, mode = "edit" }) {
   const [formData, setFormData] = useState({ ...staff });
+  const [passportPhoto, setPassportPhoto] = useState(null);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -24,7 +25,36 @@ function StaffEditForm({ staff = {}, onSave, onCancel, mode = "edit" }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave(formData);
+
+    const payload = new FormData();
+
+    Object.entries(formData).forEach(([key, value]) => {
+      if (value === undefined || value === null) return;
+
+      // Handle arrays
+      if (key === "professionalAssociations" || key === "recentTrainings") {
+        // Convert comma-separated string to array if editing
+        const arr = Array.isArray(value)
+          ? value
+          : value.split(",").map((v) => v.trim()).filter((v) => v);
+        arr.forEach((v) => payload.append(key, v));
+      }
+      // Handle nested objects
+      else if (typeof value === "object" && !(value instanceof File)) {
+        payload.append(key, JSON.stringify(value));
+      }
+      // Skip passportPhoto here (will append separately)
+      else if (key !== "passportPhoto") {
+        payload.append(key, value);
+      }
+    });
+
+    // Append passport image if selected
+    if (passportPhoto) {
+      payload.append("passportPhoto", passportPhoto);
+    }
+
+    onSave(payload);
   };
 
   return (
@@ -35,9 +65,19 @@ function StaffEditForm({ staff = {}, onSave, onCancel, mode = "edit" }) {
           <Input label="First Name" name="firstName" value={formData.firstName || ""} onChange={handleChange} />
           <Input label="Middle Name" name="middleName" value={formData.middleName || ""} onChange={handleChange} />
           <Input label="Last Name" name="lastName" value={formData.lastName || ""} onChange={handleChange} />
-          <Input label="Date of Birth" name="dateOfBirth" type="date" value={formData.dateOfBirth || ""} onChange={handleChange} />
+          <Input
+            label="Date of Birth"
+            name="dateOfBirth"
+            type="date"
+            value={formatDateForInput(formData.dateOfBirth) || ""}
+            onChange={handleChange}
+          />
           <Select label="Gender" name="gender" value={formData.gender || ""} onChange={handleChange} options={["Male", "Female"]} />
           <Select label="Marital Status" name="maritalStatus" value={formData.maritalStatus || ""} onChange={handleChange} options={["Single","Married","Divorced","Widowed"]} />
+          <Input label="Nationality" name="nationality" value={formData.nationality || ""} onChange={handleChange} />
+          <Input label="State of Origin" name="stateOfOrigin" value={formData.stateOfOrigin || ""} onChange={handleChange} />
+          <Select label="Religion" name="religion" value={formData.religion || ""} onChange={handleChange} options={["Christianity","Islam","Traditional","Others"]} />
+          <Select label="Disability" name="disability" value={formData.disability || ""} onChange={handleChange} options={["None","Hearing Impairment","Learning Impairment","Visual Impairment","Physical Impairment","Others"]} />
         </ProfileGrid>
       </Section>
 
@@ -52,6 +92,19 @@ function StaffEditForm({ staff = {}, onSave, onCancel, mode = "edit" }) {
         </ProfileGrid>
       </Section>
 
+      {/* ===== Passport Photograph ===== */}
+      <Section title="Passport Photograph">
+        <div>
+          <label className="text-gray-500">Upload Passport Photo</label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setPassportPhoto(e.target.files[0])}
+            className="w-full border px-3 py-2 rounded mt-1"
+          />
+        </div>
+      </Section>
+
       {/* ===== Employment Information ===== */}
       <Section title="Employment Information">
         <ProfileGrid>
@@ -60,11 +113,28 @@ function StaffEditForm({ staff = {}, onSave, onCancel, mode = "edit" }) {
             name="staffId"
             value={formData.staffId || ""}
             onChange={handleChange}
-            disabled={mode === "edit"} // only disable in edit mode
+            disabled={mode === "edit"}
           />
-          <Input label="Department" name="department" value={formData.department || ""} onChange={handleChange} />
-          <Input label="Designation" name="designation" value={formData.designation || ""} onChange={handleChange} />
+          <Select
+            label="Department"
+            name="department"
+            value={formData.department || ""}
+            onChange={handleChange}
+            options={[
+              "Director-General's Office",
+              "Administrative and Human Resources",
+              "Finance and Accounts",
+              "Management Consultancy Services",
+              "Planning and Research",
+              "Learning and Development",
+              "Technical Services and Quality Assurance",
+              "Gender Development Studies and Special Duties",
+              "Information and Communications Technology",
+            ]}
+          />
           <Input label="Unit" name="unit" value={formData.unit || ""} onChange={handleChange} />
+          <Input label="Job Title" name="jobTitle" value={formData.jobTitle || ""} onChange={handleChange} />
+          <Input label="Designation" name="designation" value={formData.designation || ""} onChange={handleChange} />
           <Input label="Grade Level" name="gradeLevel" value={formData.gradeLevel || ""} onChange={handleChange} />
           <Input label="Step" name="step" value={formData.step || ""} onChange={handleChange} />
           <Select
@@ -74,11 +144,29 @@ function StaffEditForm({ staff = {}, onSave, onCancel, mode = "edit" }) {
             onChange={handleChange}
             options={["Permanent","Temporary","Fixed-Term Contract","Expatriate","Others"]}
           />
-          <Input label="Date of First Appointment" name="dateOfFirstAppointment" type="date" value={formData.dateOfFirstAppointment || ""} onChange={handleChange} />
-          <Input label="Confirmation Date" name="confirmationDate" type="date" value={formData.confirmationDate || ""} onChange={handleChange} />
-          <Input label="Last Promotion Date" name="lastPromotionDate" type="date" value={formData.lastPromotionDate || ""} onChange={handleChange} />
-          <Input label="Next Promotion Eligibility Date" name="nextPromotionEligibilityDate" type="date" value={formData.nextPromotionEligibilityDate || ""} onChange={handleChange} />
-          <Select label="Status" name="status" value={formData.status || ""} onChange={handleChange} options={["Active","On Leave","Retired","Suspended","Seconded","Deceased"]} />
+          <Input label="Previous Employment" name="previousEmployment" value={formData.previousEmployment || ""} onChange={handleChange} />
+          <Input label="Date of First Appointment" name="dateOfFirstAppointment" type="date" value={formatDateForInput(formData.dateOfFirstAppointment) || ""} onChange={handleChange} />
+          <Input label="Confirmation Date" name="confirmationDate" type="date" value={formatDateForInput(formData.confirmationDate) || ""} onChange={handleChange} />
+          <Input label="Last Promotion Date" name="lastPromotionDate" type="date" value={formatDateForInput(formData.lastPromotionDate) || ""} onChange={handleChange} />
+          <Input label="Next Promotion Eligibility Date" name="nextPromotionEligibilityDate" type="date" value={formatDateForInput(formData.nextPromotionEligibilityDate) || ""} onChange={handleChange} />
+          <Select
+            label="Status"
+            name="status"
+            value={formData.status || ""}
+            onChange={handleChange}
+            options={["Active","On Leave","Retired","Suspended","Seconded","Deceased","Deactivated"]}
+          />
+        </ProfileGrid>
+      </Section>
+
+      {/* ===== Education & Training ===== */}
+      <Section title="Education & Training">
+        <ProfileGrid>
+          <Input label="Qualification" name="academicQualification" value={formData.education?.academicQualification || ""} onChange={(e) => handleNestedChange(e, "education")} />
+          <Input label="Institution" name="institution" value={formData.education?.institution || ""} onChange={(e) => handleNestedChange(e, "education")} />
+          <Input label="Year of Graduation" name="yearOfGraduation" value={formData.education?.yearOfGraduation || ""} onChange={(e) => handleNestedChange(e, "education")} />
+          <Input label="Professional Associations (Maximum of 3)" name="professionalAssociations" value={Array.isArray(formData.professionalAssociations) ? formData.professionalAssociations.join(", ") : formData.professionalAssociations || ""} onChange={handleChange} />
+          <Input label="Three Recent Trainings" name="recentTrainings" value={Array.isArray(formData.recentTrainings) ? formData.recentTrainings.join(", ") : formData.recentTrainings || ""} onChange={handleChange} />
         </ProfileGrid>
       </Section>
 
@@ -92,7 +180,7 @@ function StaffEditForm({ staff = {}, onSave, onCancel, mode = "edit" }) {
         </ProfileGrid>
       </Section>
 
-      {/* ===== Form Actions ===== */}
+      {/* ===== Actions ===== */}
       <div className="flex gap-3 mt-4">
         <button type="submit" className="bg-primary text-white px-4 py-2 rounded">
           {mode === "edit" ? "Save Changes" : "Create Staff"}
@@ -143,6 +231,10 @@ function Select({ label, name, value, onChange, options }) {
 
 function ProfileGrid({ children }) {
   return <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">{children}</div>;
+}
+
+function formatDateForInput(isoDate) {
+  return isoDate ? isoDate.split("T")[0] : "";
 }
 
 function Section({ title, children }) {

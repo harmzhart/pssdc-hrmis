@@ -1,4 +1,6 @@
 import Staff from "../models/Staff.js";
+import { uploadImage } from "../utils/uploadImage.js";
+
 
 // ==========================
 // CREATE STAFF (ADMIN)
@@ -6,17 +8,27 @@ import Staff from "../models/Staff.js";
 export const createStaff = async (req, res) => {
   try {
     const staffExists = await Staff.findOne({ staffId: req.body.staffId });
-
     if (staffExists) {
       return res.status(400).json({ message: "Staff ID already exists" });
     }
 
-    const staff = await Staff.create(req.body);
+    let passportPhoto;
+
+    if (req.file) {
+      passportPhoto = await uploadImage(req.file.buffer);
+    }
+
+    const staff = await Staff.create({
+      ...req.body,
+      passportPhoto,
+    });
+
     res.status(201).json(staff);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 // ==========================
 // GET ALL STAFF (TABLE VIEW)
@@ -84,9 +96,15 @@ export const getStaffById = async (req, res) => {
 // ==========================
 export const updateStaff = async (req, res) => {
   try {
+    const updateData = { ...req.body };
+
+    if (req.file) {
+      updateData.passportPhoto = await uploadImage(req.file.buffer);
+    }
+
     const updatedStaff = await Staff.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      updateData,
       { new: true, runValidators: true }
     );
 

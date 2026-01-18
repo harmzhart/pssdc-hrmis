@@ -30,6 +30,22 @@ const staffSchema = new mongoose.Schema(
       type: String,
       enum: ["Single", "Married", "Divorced", "Widowed"],
     },
+    nationality: {
+      type: String,
+      trim: true,
+    },
+    stateOfOrigin: {
+      type: String,
+      trim: true,
+    },
+    religion: {
+      type: String,
+      enum: ["Christianity", "Islam", "Traditional", "Others"],
+    },
+    disability: {
+      type: String,
+      enum: ["None", "Hearing Impairment", "Learning Impairment", "Visual Impairment", "Physical Impairment", "Others"],
+    },
     passportPhoto: {
       type: String, // Cloudinary URL
     },
@@ -134,14 +150,6 @@ const staffSchema = new mongoose.Schema(
         type: String,
       },
     ],
-
-    // ======================
-    // DOCUMENT UPLOADS
-    // ======================
-    documents: {
-      appointmentLetter: String,
-      confirmationLetter: String,
-    },
 
     // ======================
     // STAFF STATUS
