@@ -5,6 +5,8 @@ const statusStyles = {
   Active: "bg-green-700 text-white",
   "On Leave": "bg-yellow-300 text-yellow-900",
   Retired: "bg-red-700 text-white",
+  "Voluntarily Retired": "bg-red-400 text-white",
+  "Withdrawn From Service": "bg-red-400 text-white",
   Suspended: "bg-orange-400 text-white",
   Seconded: "bg-blue-700 text-white",
   Deceased: "bg-gray-700 text-white",
@@ -12,20 +14,70 @@ const statusStyles = {
 };
 
 const ITEMS_PER_PAGE = 10;
-
-// Fixed column width for sticky column
 const NAME_WIDTH = 180;
 
 function StaffTable({ staff }) {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
 
-  const totalPages = Math.ceil(staff.length / ITEMS_PER_PAGE);
+  // Sorting
+  const [sortConfig, setSortConfig] = useState({
+    key: null,
+    direction: "asc",
+  });
+
+  // Sort staff
+  const sortedStaff = [...staff].sort((a, b) => {
+    if (!sortConfig.key) return 0;
+
+    let valA = a[sortConfig.key];
+    let valB = b[sortConfig.key];
+
+    if (!valA) return 1;
+    if (!valB) return -1;
+
+    if (typeof valA === "string") {
+      valA = valA.toLowerCase();
+      valB = valB.toLowerCase();
+    }
+
+    if (valA < valB) return sortConfig.direction === "asc" ? -1 : 1;
+    if (valA > valB) return sortConfig.direction === "asc" ? 1 : -1;
+    return 0;
+  });
+
+  const totalPages = Math.ceil(sortedStaff.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedStaff = staff.slice(
+
+  const paginatedStaff = sortedStaff.slice(
     startIndex,
     startIndex + ITEMS_PER_PAGE
   );
+
+  // Sorting handler
+  const handleSort = (key) => {
+    setCurrentPage(1);
+
+    setSortConfig((prev) => ({
+      key,
+      direction:
+        prev.key === key && prev.direction === "asc"
+          ? "desc"
+          : "asc",
+    }));
+  };
+
+  const getSortIndicator = (key) => {
+    if (sortConfig.key !== key) {
+      return <span className="ml-1 text-gray-300 text-sm">⇅</span>;
+    }
+
+    return sortConfig.direction === "asc" ? (
+      <span className="ml-1 text-white font-bold text-sm">▲</span>
+    ) : (
+      <span className="ml-1 text-white font-bold text-sm">▼</span>
+    );
+  };
 
   return (
     <div className="space-y-4">
@@ -34,30 +86,59 @@ function StaffTable({ staff }) {
         <table className="min-w-[2200px] border-collapse text-sm">
           <thead className="bg-primary text-white">
             <tr>
-              {/* NON-STICKY STAFF ID */}
               <th className="p-3 text-left">Staff ID</th>
 
-              {/* STICKY NAME COLUMN */}
+              {/* Sortable Name */}
               <th
-                className="p-3 text-left sticky left-0 z-30 bg-primary"
+                className="p-3 text-left sticky left-0 z-30 bg-primary cursor-pointer select-none"
                 style={{ width: NAME_WIDTH }}
+                onClick={() => handleSort("lastName")}
               >
-                Name
+                Name <span className="ml-1 text-xs">{getSortIndicator("lastName")}</span>
               </th>
 
-              {/* SCROLLABLE COLUMNS */}
               <th className="p-3 text-left">Gender</th>
-              <th className="p-3 text-left">Department</th>
+
+              {/* Sortable Department */}
+              <th
+                className="p-3 text-left cursor-pointer select-none"
+                onClick={() => handleSort("department")}
+              >
+                Department{" "}<span className="ml-1 text-xs">{getSortIndicator("department")}</span>
+              </th>
+
               <th className="p-3 text-left">Unit</th>
               <th className="p-3 text-left">Job Title</th>
               <th className="p-3 text-left">Designation</th>
-              <th className="p-3 text-left">Grade</th>
+
+              {/* Sortable Grade */}
+              <th
+                className="p-3 text-left cursor-pointer select-none"
+                onClick={() => handleSort("gradeLevel")}
+              >
+                Grade{" "}<span className="ml-1 text-xs">{getSortIndicator("gradeLevel")}</span>
+              </th>
+
               <th className="p-3 text-left">Step</th>
               <th className="p-3 text-left">Employment Type</th>
               <th className="p-3 text-left">Phone</th>
               <th className="p-3 text-left">Official Email</th>
-              <th className="p-3 text-left">First Appointment</th>
-              <th className="p-3 text-left">Status</th>
+
+              {/* Sortable Date */}
+              <th
+                className="p-3 text-left cursor-pointer select-none"
+                onClick={() => handleSort("dateOfFirstAppointment")}
+              >
+                First Appointment{" "}<span className="ml-1 text-xs">{getSortIndicator("dateOfFirstAppointment")}</span>
+              </th>
+
+              {/* Sortable Status */}
+              <th
+                className="p-3 text-left cursor-pointer select-none"
+                onClick={() => handleSort("status")}
+              >
+                Status{" "}<span className="ml-1 text-xs">{getSortIndicator("status")}</span>
+              </th>
             </tr>
           </thead>
 
@@ -68,10 +149,9 @@ function StaffTable({ staff }) {
                 onClick={() => navigate(`/staff/${person._id}`)}
                 className="border-b hover:bg-gray-100 cursor-pointer"
               >
-                {/* NON-STICKY STAFF ID */}
                 <td className="p-3">{person.staffId}</td>
 
-                {/* STICKY NAME CELL */}
+                {/* Sticky Name */}
                 <td
                   className="p-3 sticky left-0 z-20 bg-white font-medium hover:bg-gray-100"
                   style={{ width: NAME_WIDTH }}
@@ -79,7 +159,6 @@ function StaffTable({ staff }) {
                   {person.lastName} {person.firstName}
                 </td>
 
-                {/* SCROLLABLE CELLS */}
                 <td className="p-3">{person.gender || "-"}</td>
                 <td className="p-3">{person.department}</td>
                 <td className="p-3">{person.unit || "-"}</td>
@@ -90,16 +169,20 @@ function StaffTable({ staff }) {
                 <td className="p-3">{person.employmentType}</td>
                 <td className="p-3">{person.phoneNumber || "-"}</td>
                 <td className="p-3">{person.officialEmail}</td>
+
                 <td className="p-3">
                   {person.dateOfFirstAppointment
-                    ? new Date(person.dateOfFirstAppointment).toLocaleDateString()
+                    ? new Date(
+                        person.dateOfFirstAppointment
+                      ).toLocaleDateString()
                     : "-"}
                 </td>
 
                 <td className="p-3">
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      statusStyles[person.status] || "bg-gray-100 text-gray-700"
+                      statusStyles[person.status] ||
+                      "bg-gray-100 text-gray-700"
                     }`}
                   >
                     {person.status}

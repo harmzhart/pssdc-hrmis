@@ -42,10 +42,6 @@ const staffSchema = new mongoose.Schema(
       type: String,
       enum: ["Christianity", "Islam", "Traditional", "Others"],
     },
-    disability: {
-      type: String,
-      enum: ["None", "Hearing Impairment", "Learning Impairment", "Visual Impairment", "Physical Impairment", "Others"],
-    },
     passportPhoto: {
       type: String, // Cloudinary URL
     },
@@ -78,6 +74,9 @@ const staffSchema = new mongoose.Schema(
     designation: {
       type: String,
     },
+    cadre: {
+      type: String,
+    },
     gradeLevel: {
       type: String,
     },
@@ -86,7 +85,11 @@ const staffSchema = new mongoose.Schema(
     },
     employmentType: {
       type: String,
-      enum: ["Permanent", "Temporary", "Fixed-Term Contract", "Expatriate", "Others"],
+      enum: ["Permanent", "Temporary", "Fixed-Term Contract", "Expatriate", "National Youth Service (NYSC)", "Industrial Training (IT)", "Internship", "Others"],
+    },
+    employmentMode: {
+      type: String,
+      enum: ["Employed By PSSDC", "Deployed To PSSDC"],
     },
     previousEmployment: {
       type: String,
@@ -101,6 +104,9 @@ const staffSchema = new mongoose.Schema(
       type: Date,
     },
     nextPromotionEligibilityDate: {
+      type: Date,
+    },
+    dateOfRetirement: {
       type: Date,
     },
 
@@ -121,6 +127,48 @@ const staffSchema = new mongoose.Schema(
     residentialLGA: {
       type: String,
     },
+    residentialWard: {
+      type: String,
+    },
+
+    // ======================
+    // MEDICAL/HEALTH DETAILS
+    // ======================
+    bloodGroup: {
+      type: String,
+      enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+    },
+    genotype: {
+      type: String,
+      enum: ['AA', 'AS', 'AC', 'SS', 'SC'],
+    },
+    heightCm: {
+      type: Number,
+      min: 50,
+      max: 250,
+    },
+    weightKg: {
+      type: Number,
+      min: 20,
+      max: 300,
+    },
+    disability: {
+      type: String,
+      enum: ["None", "Hearing Impairment", "Learning Impairment", "Visual Impairment", "Physical Impairment", "Others"],
+    },
+    hasMedicalCondition: {
+      type: Boolean,
+      default: false,
+    },
+
+    medicalConditionDetail: {
+      type: String,
+      trim: true,
+      maxlength: 200,
+      required: function () {
+        return this.hasMedicalCondition === true;
+      },
+    },
 
     // ======================
     // NEXT OF KIN
@@ -137,8 +185,12 @@ const staffSchema = new mongoose.Schema(
     // ======================
     education: {
       academicQualification: String,
-      institution: String,
-      yearOfGraduation: String,
+
+      additionalQualifications: [
+        {
+          type: String,
+        },
+      ],
     },
     professionalAssociations: [
       {
@@ -160,6 +212,8 @@ const staffSchema = new mongoose.Schema(
         "Active",
         "On Leave",
         "Retired",
+        "Voluntarily Retired",
+        "Withdrawn From Service",
         "Suspended",
         "Seconded",
         "Deceased",

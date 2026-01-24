@@ -31,13 +31,13 @@ function StaffProfile({ isAdmin = true }) {
   };
 
   return (
-    <div className="bg-white p-8 rounded shadow max-w-5xl mx-auto space-y-8">
+    <div className="bg-white p-6 rounded shadow max-w-5xl mx-auto space-y-6 print-area">
       <Link to="/" className="text-primary text-sm inline-block mb-4">
         ← Back to Staff List
       </Link>
 
       {/* ================= HEADER ================= */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-6 border-b pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-6 border-b pb-4 print-keep">
         {/* Passport Photo */}
         <div className="flex-shrink-0 mb-4 sm:mb-0">
           <img
@@ -67,14 +67,23 @@ function StaffProfile({ isAdmin = true }) {
           </p>
         </div>
 
-        {/* Edit Button */}
-        {isAdmin && !isEditing && (
-          <div className="mt-4 sm:mt-0 sm:ml-auto">
+        {/* ACTION BUTTONS */}
+        {!isEditing && (
+          <div className="mt-4 sm:mt-0 sm:ml-auto flex gap-2 no-print">
+            {isAdmin && (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="bg-primary text-white px-4 py-2 rounded shadow hover:bg-primary-dark transition"
+              >
+                Edit Staff Record
+              </button>
+            )}
+
             <button
-              onClick={() => setIsEditing(true)}
-              className="bg-primary text-white px-4 py-2 rounded shadow hover:bg-primary-dark transition"
+              onClick={() => window.print()}
+              className="bg-gray-700 text-white px-4 py-2 rounded shadow hover:bg-gray-800 transition"
             >
-              Edit Staff Record
+              🖨️ Print Profile
             </button>
           </div>
         )}
@@ -113,6 +122,25 @@ function StaffProfile({ isAdmin = true }) {
               <ProfileItem label="Phone" value={staff.phoneNumber || "-"} />
               <ProfileItem label="Address" value={staff.residentialAddress || "-"} />
               <ProfileItem label="LGA" value={staff.residentialLGA || "-"} />
+              <ProfileItem label="Ward" value={staff.residentialWard || "-"} />
+            </ProfileGrid>
+          </Section>
+
+          {/* Medical / Health Details */}
+          <Section title="Medical / Health Details">
+            <ProfileGrid>
+              <ProfileItem label="Blood Group" value={staff.bloodGroup || "-"} />
+              <ProfileItem label="Genotype" value={staff.genotype || "-"} />
+              <ProfileItem label="Height (cm)" value={staff.heightCm || "-"} />
+              <ProfileItem label="Weight (kg)" value={staff.weightKg || "-"} />
+              <ProfileItem label="Disability" value={staff.disability || "-"} />
+
+              {staff.hasMedicalCondition && (
+                <ProfileItem
+                  label="Medical Condition"
+                  value={staff.medicalConditionDetail || "-"}
+                />
+              )}
             </ProfileGrid>
           </Section>
 
@@ -123,6 +151,7 @@ function StaffProfile({ isAdmin = true }) {
               <ProfileItem label="Unit" value={staff.unit || "-"} />
               <ProfileItem label="Job Title" value={staff.jobTitle || "-"} />
               <ProfileItem label="Designation" value={staff.designation || "-"} />
+              <ProfileItem label="Cadre" value={staff.cadre || "-"} />
               <ProfileItem label="Grade" value={staff.gradeLevel || "-"} />
               <ProfileItem label="Step" value={staff.step || "-"} />
               <ProfileItem label="Previous Employment" value={staff.previousEmployment || "-"} />
@@ -130,16 +159,17 @@ function StaffProfile({ isAdmin = true }) {
               <ProfileItem label="Confirmation Date" value={formatDate(staff.confirmationDate)} />
               <ProfileItem label="Last Promotion" value={formatDate(staff.lastPromotionDate)} />
               <ProfileItem label="Next Promotion Eligibility" value={formatDate(staff.nextPromotionEligibilityDate)} />
+              <ProfileItem label="Date of Retirement" value={formatDate(staff.dateOfRetirement)} />
               <ProfileItem label="Employment Type" value={staff.employmentType || "-"} />
+              <ProfileItem label="Employment Mode" value={staff.employmentMode || "-"} />
             </ProfileGrid>
           </Section>
 
           {/* Education & Training */}
           <Section title="Education & Training">
             <ProfileGrid>
-              <ProfileItem label="Qualification" value={staff.education?.academicQualification || "-"} />
-              <ProfileItem label="Institution" value={staff.education?.institution || "-"} />
-              <ProfileItem label="Year of Graduation" value={staff.education?.yearOfGraduation || "-"} />
+              <ProfileItem label="Academic Qualification" value={staff.education?.academicQualification || "-"} />
+              <ProfileItem label="Additional Qualification(s)" value={staff.education?.additionalQualifications?.join(", ") || "-"} />
               <ProfileItem label="Professional Associations" value={staff.professionalAssociations?.join(", ") || "-"} />
               <ProfileItem label="Recent Trainings" value={staff.recentTrainings?.join(", ") || "-"} />
             </ProfileGrid>
@@ -178,8 +208,8 @@ function ProfileGrid({ children }) {
 
 function Section({ title, children }) {
   return (
-    <div className="border-t pt-4">
-      <h3 className="text-lg font-semibold mb-3">{title}</h3>
+    <div className="border-t pt-4 print-section">
+      <h3 className="text-lg font-semibold mb-3 print-keep">{title}</h3>
       {children}
     </div>
   );
@@ -211,6 +241,10 @@ function statusStyles(status) {
       return "bg-yellow-300 text-yellow-900";
     case "Retired":
       return "bg-red-700 text-white";
+    case "Voluntarily Retired":
+      return "bg-red-400 text-white";
+    case "Withdrawn From Service":
+      return "bg-red-400 text-white";
     case "Suspended":
       return "bg-orange-400 text-white";
     case "Seconded":

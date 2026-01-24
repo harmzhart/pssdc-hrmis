@@ -89,6 +89,43 @@ function StaffEditForm({ staff = {}, onSave, onCancel, mode = "edit" }) {
           <Input label="Phone" name="phoneNumber" value={formData.phoneNumber || ""} onChange={handleChange} />
           <Input label="Address" name="residentialAddress" value={formData.residentialAddress || ""} onChange={handleChange} />
           <Input label="LGA" name="residentialLGA" value={formData.residentialLGA || ""} onChange={handleChange} />
+          <Input label="Ward" name="residentialWard" value={formData.residentialWard || ""} onChange={handleChange} />
+        </ProfileGrid>
+      </Section>
+
+      {/* ===== Medical/Health Details ===== */}
+      <Section title="Medical / Health Details">
+        <ProfileGrid>
+          <Select label="Blood Group" name="bloodGroup" value={formData.bloodGroup || ""} onChange={handleChange}
+            options={["A+","A-","B+","B-","AB+","AB-","O+","O-"]} />
+
+          <Select label="Genotype" name="genotype" value={formData.genotype || ""} onChange={handleChange}
+            options={["AA","AS","AC","SS","SC"]} />
+
+          <Input label="Height (cm)" name="heightCm" type="number" value={formData.heightCm || ""} onChange={handleChange} />
+          <Input label="Weight (kg)" name="weightKg" type="number" value={formData.weightKg || ""} onChange={handleChange} />
+
+          <Select label="Disability" name="disability" value={formData.disability || ""} onChange={handleChange}
+            options={["None","Hearing Impairment","Learning Impairment","Visual Impairment","Physical Impairment","Others"]} />
+
+          <Select
+            label="Any Known Medical Condition?"
+            name="hasMedicalCondition"
+            value={formData.hasMedicalCondition === true ? "Yes" : formData.hasMedicalCondition === false ? "No" : ""}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                hasMedicalCondition: e.target.value === "Yes",
+                medicalConditionDetail: e.target.value === "No" ? "" : formData.medicalConditionDetail,
+              })
+            }
+            options={["No", "Yes"]}
+          />
+
+          {formData.hasMedicalCondition && (
+            <Input label="Medical Condition Detail" name="medicalConditionDetail"
+              value={formData.medicalConditionDetail || ""} onChange={handleChange} />
+          )}
         </ProfileGrid>
       </Section>
 
@@ -135,6 +172,7 @@ function StaffEditForm({ staff = {}, onSave, onCancel, mode = "edit" }) {
           <Input label="Unit" name="unit" value={formData.unit || ""} onChange={handleChange} />
           <Input label="Job Title" name="jobTitle" value={formData.jobTitle || ""} onChange={handleChange} />
           <Input label="Designation" name="designation" value={formData.designation || ""} onChange={handleChange} />
+          <Input label="Cadre" name="cadre" value={formData.cadre || ""} onChange={handleChange} />
           <Input label="Grade Level" name="gradeLevel" value={formData.gradeLevel || ""} onChange={handleChange} />
           <Input label="Step" name="step" value={formData.step || ""} onChange={handleChange} />
           <Select
@@ -142,19 +180,27 @@ function StaffEditForm({ staff = {}, onSave, onCancel, mode = "edit" }) {
             name="employmentType"
             value={formData.employmentType || ""}
             onChange={handleChange}
-            options={["Permanent","Temporary","Fixed-Term Contract","Expatriate","Others"]}
+            options={["Permanent","Temporary","Fixed-Term Contract","Expatriate","National Youth Service (NYSC)","Industrial Training (IT)","Internship","Others"]}
+          />
+          <Select
+            label="Employment Mode"
+            name="employmentMode"
+            value={formData.employmentMode || ""}
+            onChange={handleChange}
+            options={["Employed By PSSDC", "Deployed To PSSDC"]}
           />
           <Input label="Previous Employment" name="previousEmployment" value={formData.previousEmployment || ""} onChange={handleChange} />
           <Input label="Date of First Appointment" name="dateOfFirstAppointment" type="date" value={formatDateForInput(formData.dateOfFirstAppointment) || ""} onChange={handleChange} />
           <Input label="Confirmation Date" name="confirmationDate" type="date" value={formatDateForInput(formData.confirmationDate) || ""} onChange={handleChange} />
           <Input label="Last Promotion Date" name="lastPromotionDate" type="date" value={formatDateForInput(formData.lastPromotionDate) || ""} onChange={handleChange} />
           <Input label="Next Promotion Eligibility Date" name="nextPromotionEligibilityDate" type="date" value={formatDateForInput(formData.nextPromotionEligibilityDate) || ""} onChange={handleChange} />
+          <Input label="Date of Retirement" name="dateOfRetirement" type="date" value={formatDateForInput(formData.dateOfRetirement) || ""} onChange={handleChange} />
           <Select
             label="Status"
             name="status"
             value={formData.status || ""}
             onChange={handleChange}
-            options={["Active","On Leave","Retired","Suspended","Seconded","Deceased","Deactivated"]}
+            options={["Active","On Leave","Retired","Voluntarily Retired","Withdrawn From Service","Suspended","Seconded","Deceased","Deactivated"]}
           />
         </ProfileGrid>
       </Section>
@@ -162,9 +208,30 @@ function StaffEditForm({ staff = {}, onSave, onCancel, mode = "edit" }) {
       {/* ===== Education & Training ===== */}
       <Section title="Education & Training">
         <ProfileGrid>
-          <Input label="Qualification" name="academicQualification" value={formData.education?.academicQualification || ""} onChange={(e) => handleNestedChange(e, "education")} />
-          <Input label="Institution" name="institution" value={formData.education?.institution || ""} onChange={(e) => handleNestedChange(e, "education")} />
-          <Input label="Year of Graduation" name="yearOfGraduation" value={formData.education?.yearOfGraduation || ""} onChange={(e) => handleNestedChange(e, "education")} />
+          <Input label="Academic Qualification" name="academicQualification" value={formData.education?.academicQualification || ""} onChange={(e) => handleNestedChange(e, "education")} />
+          <Input
+            label="Additional Qualification(s)"
+            name="additionalQualifications"
+            value={
+              Array.isArray(formData.education?.additionalQualifications)
+                ? formData.education.additionalQualifications.join(", ")
+                : formData.education?.additionalQualifications || ""
+            }
+            onChange={(e) => {
+              const values = e.target.value
+                .split(",")
+                .map((v) => v.trim())
+                .filter(Boolean);
+
+              setFormData({
+                ...formData,
+                education: {
+                  ...formData.education,
+                  additionalQualifications: values,
+                },
+              });
+            }}
+          />
           <Input label="Professional Associations (Maximum of 3)" name="professionalAssociations" value={Array.isArray(formData.professionalAssociations) ? formData.professionalAssociations.join(", ") : formData.professionalAssociations || ""} onChange={handleChange} />
           <Input label="Three Recent Trainings" name="recentTrainings" value={Array.isArray(formData.recentTrainings) ? formData.recentTrainings.join(", ") : formData.recentTrainings || ""} onChange={handleChange} />
         </ProfileGrid>
