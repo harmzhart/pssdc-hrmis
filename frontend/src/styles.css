@@ -25,7 +25,7 @@ body {
     left: 0;
     top: 0;
     width: 100%;
-    padding: 20px;
+    padding: 14px;   /* reduced from 20px */
   }
 
   /* Hide controls */
@@ -33,29 +33,29 @@ body {
     display: none !important;
   }
 
-  /* Typography */
+  /* Typography – tighter */
   body {
     background: white;
-    font-size: 12px;
-    line-height: 1.4;
+    font-size: 11.5px;     /* slightly smaller */
+    line-height: 1.28;    /* reduced from 1.4 */
   }
 
   h1 {
-    font-size: 20px;
-    margin-bottom: 4px;
+    font-size: 19px;
+    margin-bottom: 2px;   /* reduced */
   }
 
   h3 {
-    font-size: 15px;
-    margin-bottom: 6px;
+    font-size: 14px;
+    margin-bottom: 4px;   /* reduced */
   }
 
   p {
-    margin: 2px 0;
+    margin: 1px 0;        /* tighter */
   }
 
   img {
-    max-height: 150px;
+    max-height: 135px;   /* slightly smaller */
     object-fit: cover;
   }
 
@@ -72,12 +72,21 @@ body {
 
   /* Reduce grid spacing for print */
   .grid {
-    gap: 12px !important;
+    gap: 8px !important;   /* reduced from 12px */
   }
 
-  /* Avoid massive white gaps */
+  /* Reduce vertical section spacing */
   .space-y-6 > * + * {
-    margin-top: 20px !important;
+    margin-top: 12px !important;  /* reduced from 20px */
+  }
+
+  .space-y-8 > * + * {
+    margin-top: 14px !important;
+  }
+
+  /* Reduce line spacing in label/value rows */
+  .text-sm {
+    line-height: 1.25 !important;
   }
 
   /* Force clean page breaks between major sections if needed */

@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { fetchStaffById } from "../services/staffService";
 import StaffEditForm from "../components/StaffEditForm";
 import { updateStaff } from "../services/staffService";
+import html2pdf from "html2pdf.js";
 
 function StaffProfile({ isAdmin = true }) {
   const { id } = useParams();
@@ -30,14 +31,72 @@ function StaffProfile({ isAdmin = true }) {
     }
   };
 
+  const handleExportPDF = () => {
+    const element = document.querySelector(".print-area");
+
+    // Hide non-print elements
+    const noPrintElements = document.querySelectorAll(".no-print");
+    noPrintElements.forEach(el => (el.style.display = "none"));
+
+    const opt = {
+      margin: [10, 10, 10, 10],
+      filename: `${staff.lastName}_${staff.firstName}_Profile.pdf`,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+      pagebreak: { mode: ["avoid-all", "css"] },
+    };
+
+    html2pdf()
+      .set(opt)
+      .from(element)
+      .save()
+      .finally(() => {
+        // Restore visibility after PDF generation
+        noPrintElements.forEach(el => (el.style.display = ""));
+      });
+  };
+
   return (
     <div className="bg-white p-6 rounded shadow max-w-5xl mx-auto space-y-6 print-area">
-      <Link to="/" className="text-primary text-sm inline-block mb-4">
+
+      {/* ================= PRINT HEADER (ONLY FOR PRINT) ================= */}
+      <div className="print-header hidden print:block mb-6 border-b pb-4">
+        <div className="flex items-center justify-between">
+          {/* Logo + Institution */}
+          <div className="flex items-center space-x-3">
+            <img
+              src="/pssdc-logo.png"
+              alt="PSSDC Logo"
+              className="w-16 h-16 object-contain"
+            />
+
+            <div className="leading-[1.00]">
+              <h2 className="text-sm font-bold max-w-[240px] m-0 p-0">
+                Lagos State Public Service Staff Development Centre (PSSDC)
+              </h2>
+              <p className="text-xs m-0 p-0 mt-[1px]">
+                Magodo, Lagos State, Nigeria
+              </p>
+            </div>
+          </div>
+
+          {/* Printed Date */}
+          <div className="text-sm text-right">
+            <p className="font-medium">Staff Profile</p>
+            <p className="opacity-80">
+              Printed on: {new Date().toLocaleString()}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <Link to="/" className="text-primary text-sm inline-block mb-4 no-print">
         ← Back to Staff List
       </Link>
 
       {/* ================= HEADER ================= */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-6 border-b pb-4 print-keep">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-6 pb-4 print-keep">
         {/* Passport Photo */}
         <div className="flex-shrink-0 mb-4 sm:mb-0">
           <img
@@ -84,6 +143,13 @@ function StaffProfile({ isAdmin = true }) {
               className="bg-gray-700 text-white px-4 py-2 rounded shadow hover:bg-gray-800 transition"
             >
               🖨️ Print Profile
+            </button>
+
+            <button
+              onClick={handleExportPDF}
+              className="bg-green-700 text-white px-4 py-2 rounded shadow hover:bg-green-800 transition"
+            >
+              📄 Export as PDF
             </button>
           </div>
         )}
