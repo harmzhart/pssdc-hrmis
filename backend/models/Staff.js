@@ -10,13 +10,13 @@ const staffSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    middleName: {
+      type: String,
+      trim: true,
+    },
     lastName: {
       type: String,
       required: true,
-      trim: true,
-    },
-    middleName: {
-      type: String,
       trim: true,
     },
     dateOfBirth: {
@@ -33,6 +33,7 @@ const staffSchema = new mongoose.Schema(
     nationality: {
       type: String,
       trim: true,
+      default: "Nigerian",
     },
     stateOfOrigin: {
       type: String,
@@ -44,6 +45,69 @@ const staffSchema = new mongoose.Schema(
     },
     passportPhoto: {
       type: String, // Cloudinary URL
+    },
+
+    // ======================
+    // CONTACT DETAILS
+    // ======================
+    alternativeEmail: {
+      type: String,
+      lowercase: true,
+      trim: true,
+    },
+    phoneNumber: {
+      type: String,
+    },
+    residentialAddress: {
+      type: String,
+    },
+    residentialLGA: {
+      type: String,
+    },
+    residentialWard: {
+      type: String,
+    },
+    contactAddress: {
+      type: String,
+    },
+
+    // ======================
+    // MEDICAL/HEALTH DETAILS
+    // ======================
+    bloodGroup: {
+      type: String,
+      enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+    },
+    genotype: {
+      type: String,
+      enum: ['AA', 'AS', 'AC', 'SS', 'SC'],
+    },
+    heightCm: {
+      type: Number,
+      min: 50,
+      max: 250,
+    },
+    weightKg: {
+      type: Number,
+      min: 20,
+      max: 300,
+    },
+    disability: {
+      type: String,
+      enum: ["None", "Hearing Impairment", "Learning Impairment", "Visual Impairment", "Physical Impairment", "Others"],
+    },
+    hasMedicalCondition: {
+      type: Boolean,
+      default: false,
+    },
+
+    medicalConditionDetail: {
+      type: String,
+      trim: true,
+      maxlength: 200,
+      required: function () {
+        return this.hasMedicalCondition === true;
+      },
     },
 
     // ======================
@@ -111,76 +175,6 @@ const staffSchema = new mongoose.Schema(
     },
 
     // ======================
-    // CONTACT DETAILS
-    // ======================
-    alternativeEmail: {
-      type: String,
-      lowercase: true,
-      trim: true,
-    },
-    phoneNumber: {
-      type: String,
-    },
-    residentialAddress: {
-      type: String,
-    },
-    residentialLGA: {
-      type: String,
-    },
-    residentialWard: {
-      type: String,
-    },
-
-    // ======================
-    // MEDICAL/HEALTH DETAILS
-    // ======================
-    bloodGroup: {
-      type: String,
-      enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
-    },
-    genotype: {
-      type: String,
-      enum: ['AA', 'AS', 'AC', 'SS', 'SC'],
-    },
-    heightCm: {
-      type: Number,
-      min: 50,
-      max: 250,
-    },
-    weightKg: {
-      type: Number,
-      min: 20,
-      max: 300,
-    },
-    disability: {
-      type: String,
-      enum: ["None", "Hearing Impairment", "Learning Impairment", "Visual Impairment", "Physical Impairment", "Others"],
-    },
-    hasMedicalCondition: {
-      type: Boolean,
-      default: false,
-    },
-
-    medicalConditionDetail: {
-      type: String,
-      trim: true,
-      maxlength: 200,
-      required: function () {
-        return this.hasMedicalCondition === true;
-      },
-    },
-
-    // ======================
-    // NEXT OF KIN
-    // ======================
-    nextOfKin: {
-      name: String,
-      relationship: String,
-      phoneNumber: String,
-      address: String,
-    },
-
-    // ======================
     // EDUCATION & TRAINING
     // ======================
     education: {
@@ -202,6 +196,16 @@ const staffSchema = new mongoose.Schema(
         type: String,
       },
     ],
+
+    // ======================
+    // NEXT OF KIN
+    // ======================
+    nextOfKin: {
+      name: String,
+      relationship: String,
+      phoneNumber: String,
+      address: String,
+    },
 
     // ======================
     // STAFF STATUS

@@ -87,9 +87,10 @@ function StaffEditForm({ staff = {}, onSave, onCancel, mode = "edit" }) {
           <Input label="Official Email" name="officialEmail" type="email" value={formData.officialEmail || ""} onChange={handleChange} />
           <Input label="Alternative Email" name="alternativeEmail" type="email" value={formData.alternativeEmail || ""} onChange={handleChange} />
           <Input label="Phone" name="phoneNumber" value={formData.phoneNumber || ""} onChange={handleChange} />
-          <Input label="Address" name="residentialAddress" value={formData.residentialAddress || ""} onChange={handleChange} />
-          <Input label="LGA" name="residentialLGA" value={formData.residentialLGA || ""} onChange={handleChange} />
-          <Input label="Ward" name="residentialWard" value={formData.residentialWard || ""} onChange={handleChange} />
+          <Input label="Residential Address" name="residentialAddress" value={formData.residentialAddress || ""} onChange={handleChange} />
+          <Input label="Residential LGA" name="residentialLGA" value={formData.residentialLGA || ""} onChange={handleChange} />
+          <Input label="Residential Ward" name="residentialWard" value={formData.residentialWard || ""} onChange={handleChange} />
+          <Input label="Contact Address" name="contactAddress" value={formData.contactAddress || ""} onChange={handleChange} />
         </ProfileGrid>
       </Section>
 

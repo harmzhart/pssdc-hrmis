@@ -3,7 +3,6 @@ import { useParams, Link } from "react-router-dom";
 import { fetchStaffById } from "../services/staffService";
 import StaffEditForm from "../components/StaffEditForm";
 import { updateStaff } from "../services/staffService";
-import html2pdf from "html2pdf.js";
 
 function StaffProfile({ isAdmin = true }) {
   const { id } = useParams();
@@ -29,32 +28,6 @@ function StaffProfile({ isAdmin = true }) {
     } catch (error) {
       alert("Failed to update staff");
     }
-  };
-
-  const handleExportPDF = () => {
-    const element = document.querySelector(".print-area");
-
-    // Hide non-print elements
-    const noPrintElements = document.querySelectorAll(".no-print");
-    noPrintElements.forEach(el => (el.style.display = "none"));
-
-    const opt = {
-      margin: [10, 10, 10, 10],
-      filename: `${staff.lastName}_${staff.firstName}_Profile.pdf`,
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
-      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-      pagebreak: { mode: ["avoid-all", "css"] },
-    };
-
-    html2pdf()
-      .set(opt)
-      .from(element)
-      .save()
-      .finally(() => {
-        // Restore visibility after PDF generation
-        noPrintElements.forEach(el => (el.style.display = ""));
-      });
   };
 
   return (
@@ -144,13 +117,6 @@ function StaffProfile({ isAdmin = true }) {
             >
               🖨️ Print Profile
             </button>
-
-            <button
-              onClick={handleExportPDF}
-              className="bg-green-700 text-white px-4 py-2 rounded shadow hover:bg-green-800 transition"
-            >
-              📄 Export as PDF
-            </button>
           </div>
         )}
       </div>
@@ -186,9 +152,10 @@ function StaffProfile({ isAdmin = true }) {
               <ProfileItem label="Official Email" value={staff.officialEmail} />
               <ProfileItem label="Alternative Email" value={staff.alternativeEmail || "-"} />
               <ProfileItem label="Phone" value={staff.phoneNumber || "-"} />
-              <ProfileItem label="Address" value={staff.residentialAddress || "-"} />
-              <ProfileItem label="LGA" value={staff.residentialLGA || "-"} />
-              <ProfileItem label="Ward" value={staff.residentialWard || "-"} />
+              <ProfileItem label="Residential Address" value={staff.residentialAddress || "-"} />
+              <ProfileItem label="Residential LGA" value={staff.residentialLGA || "-"} />
+              <ProfileItem label="Residential Ward" value={staff.residentialWard || "-"} />
+              <ProfileItem label="Contact Address" value={staff.contactAddress || "-"} />
             </ProfileGrid>
           </Section>
 

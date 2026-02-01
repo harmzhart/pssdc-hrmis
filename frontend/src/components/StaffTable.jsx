@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const statusStyles = {
   Active: "bg-green-700 text-white",
@@ -16,7 +16,7 @@ const statusStyles = {
 const ITEMS_PER_PAGE = 10;
 const NAME_WIDTH = 180;
 
-function StaffTable({ staff }) {
+function StaffTable({ staff, resetKey, onSortingChange }) {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -58,13 +58,17 @@ function StaffTable({ staff }) {
   const handleSort = (key) => {
     setCurrentPage(1);
 
-    setSortConfig((prev) => ({
-      key,
-      direction:
-        prev.key === key && prev.direction === "asc"
-          ? "desc"
-          : "asc",
-    }));
+    setSortConfig((prev) => {
+      const nextDirection =
+        prev.key === key && prev.direction === "asc" ? "desc" : "asc";
+
+      return {
+        key,
+        direction: nextDirection,
+      };
+    });
+
+    onSortingChange(true);
   };
 
   const getSortIndicator = (key) => {
@@ -78,6 +82,17 @@ function StaffTable({ staff }) {
       <span className="ml-1 text-white font-bold text-sm">▼</span>
     );
   };
+
+  useEffect(() => {
+    // Reset sorting and pagination when Clear All is pressed
+    setSortConfig({
+      key: null,
+      direction: "asc",
+    });
+    setCurrentPage(1);
+    // inform parent sorting is cleared
+    onSortingChange(false);
+  }, [resetKey]);
 
   return (
     <div className="space-y-4">

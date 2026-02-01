@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { fetchStaff, createStaff } from "../services/staffService";
 import StaffTable from "../components/StaffTable";
 import StaffEditForm from "../components/StaffEditForm";
+import StaffImport from "../components/StaffImport.jsx";
 import * as XLSX from "xlsx";
 
 function StaffList() {
@@ -10,6 +11,8 @@ function StaffList() {
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [resetTableKey, setResetTableKey] = useState(0);
+  const [hasSorting, setHasSorting] = useState(false);
 
   // Filters
   const [filters, setFilters] = useState({
@@ -53,6 +56,28 @@ function StaffList() {
       matchesEmploymentMode
     );
   });
+
+  const resetAll = () => {
+    setSearch("");
+    setFilters({
+      department: "",
+      status: "",
+      gender: "",
+      employmentMode: "",
+    });
+
+    // trigger table reset
+    setHasSorting(false);
+    setResetTableKey((prev) => prev + 1);
+  };
+
+  const isFiltered =
+    search ||
+    filters.department ||
+    filters.status ||
+    filters.gender ||
+    filters.employmentMode ||
+    hasSorting;
 
   // Handle staff creation
   const handleCreateStaff = async (newStaff) => {
@@ -101,7 +126,10 @@ function StaffList() {
       {/* Header */}
       <div className="mb-4 space-y-3">
         {/* Title */}
-        <h2 className="text-lg font-semibold">Staff Directory</h2>
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <h2 className="text-lg font-semibold">Staff Directory</h2>
+          <StaffImport />
+        </div>
 
         {/* Controls Container */}
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-3 md:grid-cols-4 md:gap-3 lg:flex lg:items-center lg:justify-between">
@@ -208,6 +236,22 @@ function StaffList() {
           {/* RIGHT ACTIONS */}
           <div className="flex gap-2 lg:ml-auto w-full lg:w-auto">
 
+            {/* CLEAR ALL */}
+            <button
+              onClick={resetAll}
+              disabled={!isFiltered}
+              className={`
+                border px-4 py-2 rounded 
+                whitespace-nowrap 
+                w-full sm:w-full lg:w-auto
+                ${isFiltered 
+                  ? "bg-white hover:bg-gray-100" 
+                  : "bg-gray-100 text-gray-400 cursor-not-allowed"}
+              `}
+            >
+              Clear All
+            </button>
+
             {/* EXPORT */}
             <button
               onClick={handleExport}
@@ -241,7 +285,7 @@ function StaffList() {
       {loading ? (
         <p>Loading staff...</p>
       ) : (
-        <StaffTable staff={filteredStaff} />
+        <StaffTable staff={filteredStaff} resetKey={resetTableKey} onSortingChange={setHasSorting} />
       )}
 
       {/* Create Staff Modal */}

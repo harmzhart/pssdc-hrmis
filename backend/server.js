@@ -5,7 +5,7 @@ import express from "express";
 import cors from "cors";
 import connectDB from "./config/db.js";
 import staffRoutes from "./routes/staffRoutes.js";
-import importRoutes from "./routes/importRoutes.js";
+import staffImportRoutes from "./routes/staffImportRoutes.js";
 import cloudinary from "./config/cloudinary.js";
 
 // Connect Database
@@ -18,11 +18,17 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/staff", staffRoutes);
-app.use("/api/import", importRoutes);
+app.use("/api/staff", staffImportRoutes);
 
 // Test route
 app.get("/", (req, res) => {
   res.send("PSSDC HRMIS API is running");
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error("Unhandled error:", err.message);
+  res.status(500).json({ message: "Server error", error: err.message });
 });
 
 const PORT = process.env.PORT || 5000;
