@@ -1,5 +1,6 @@
 import express from "express";
 import upload from "../middleware/uploadMiddleware.js";
+import { protect } from "../middleware/authMiddleware.js";
 import {
   createStaff,
   getAllStaff,
@@ -10,10 +11,10 @@ import {
 
 const router = express.Router();
 
-router.post("/", upload.single("passportPhoto"), createStaff);              // Create staff
-router.get("/", getAllStaff);                // List all staff
-router.get("/:id", getStaffById);             // Single staff
-router.put("/:id", upload.single("passportPhoto"), updateStaff);              // Update staff
-router.patch("/:id/deactivate", deactivateStaff); // Deactivate staff
+router.post("/", protect, upload.single("passportPhoto"), createStaff);
+router.get("/", protect, getAllStaff);
+router.get("/:id", protect, getStaffById);
+router.put("/:id", protect, upload.single("passportPhoto"), updateStaff);
+router.patch("/:id/deactivate", protect, deactivateStaff);
 
 export default router;

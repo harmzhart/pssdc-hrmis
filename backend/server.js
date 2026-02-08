@@ -7,6 +7,8 @@ import connectDB from "./config/db.js";
 import staffRoutes from "./routes/staffRoutes.js";
 import staffImportRoutes from "./routes/staffImportRoutes.js";
 import cloudinary from "./config/cloudinary.js";
+import cookieParser from "cookie-parser";
+import authRoutes from "./routes/authRoutes.js";
 
 // Connect Database
 connectDB();
@@ -14,11 +16,18 @@ connectDB();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 app.use(express.json());
+app.use(cookieParser());
 
 app.use("/api/staff", staffRoutes);
 app.use("/api/staff", staffImportRoutes);
+app.use("/api/auth", authRoutes);
 
 // Test route
 app.get("/", (req, res) => {

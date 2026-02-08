@@ -33,9 +33,42 @@ function StaffTable({ staff, resetKey, onSortingChange }) {
     let valA = a[sortConfig.key];
     let valB = b[sortConfig.key];
 
-    if (!valA) return 1;
-    if (!valB) return -1;
+    if (valA == null) return 1;
+    if (valB == null) return -1;
 
+    // 🔹 Special handling for Grade Level (numeric sort)
+    if (sortConfig.key === "gradeLevel") {
+      const numA = parseInt(String(valA).replace(/\D/g, ""), 10);
+      const numB = parseInt(String(valB).replace(/\D/g, ""), 10);
+
+      if (isNaN(numA)) return 1;
+      if (isNaN(numB)) return -1;
+
+      return sortConfig.direction === "asc" ? numA - numB : numB - numA;
+    }
+
+    // 🔹 Special handling for Step (numeric sort)
+    if (sortConfig.key === "step") {
+      const numA = Number(valA);
+      const numB = Number(valB);
+
+      if (isNaN(numA)) return 1;
+      if (isNaN(numB)) return -1;
+
+      return sortConfig.direction === "asc" ? numA - numB : numB - numA;
+    }
+
+    // 🔹 Dates
+    if (sortConfig.key === "dateOfFirstAppointment") {
+      const dateA = new Date(valA);
+      const dateB = new Date(valB);
+
+      return sortConfig.direction === "asc"
+        ? dateA - dateB
+        : dateB - dateA;
+    }
+
+    // 🔹 Default string sort
     if (typeof valA === "string") {
       valA = valA.toLowerCase();
       valB = valB.toLowerCase();

@@ -4,7 +4,9 @@ const API_URL = "http://localhost:5000/api/staff";
 // FETCH ALL STAFF
 // ==========================
 export const fetchStaff = async () => {
-  const response = await fetch(API_URL);
+  const response = await fetch(API_URL, {
+    credentials: "include", // ← send cookie for auth
+  });
   if (!response.ok) throw new Error("Failed to fetch staff");
   return response.json();
 };
@@ -13,7 +15,9 @@ export const fetchStaff = async () => {
 // FETCH SINGLE STAFF
 // ==========================
 export const fetchStaffById = async (id) => {
-  const response = await fetch(`${API_URL}/${id}`);
+  const response = await fetch(`${API_URL}/${id}`, {
+    credentials: "include", // ← send cookie for auth
+  });
   if (!response.ok) throw new Error("Failed to fetch staff");
   return response.json();
 };
@@ -24,7 +28,8 @@ export const fetchStaffById = async (id) => {
 export const createStaff = async (formData) => {
   const response = await fetch(API_URL, {
     method: "POST",
-    body: formData, // ✅ FormData (NO headers)
+    credentials: "include", // ← send cookie for auth
+    body: formData,         // FormData (do NOT set headers)
   });
 
   if (!response.ok) {
@@ -41,7 +46,8 @@ export const createStaff = async (formData) => {
 export const updateStaff = async (id, formData) => {
   const response = await fetch(`${API_URL}/${id}`, {
     method: "PUT",
-    body: formData, // ✅ FormData (NO headers)
+    credentials: "include", // ← send cookie for auth
+    body: formData,         // FormData (do NOT set headers)
   });
 
   if (!response.ok) {
