@@ -87,6 +87,40 @@ function StaffTable({ staff, resetKey, onSortingChange }) {
     startIndex + ITEMS_PER_PAGE
   );
 
+  const showingFrom = sortedStaff.length === 0 ? 0 : startIndex + 1;
+  const showingTo = Math.min(startIndex + ITEMS_PER_PAGE, sortedStaff.length);
+  const totalItems = sortedStaff.length;
+  const totalAll = staff.length;
+
+  const getVisiblePages = () => {
+    const delta = 2; // pages to show on each side
+    const range = [];
+    const rangeWithDots = [];
+
+    let left = Math.max(1, currentPage - delta);
+    let right = Math.min(totalPages, currentPage + delta);
+
+    for (let i = left; i <= right; i++) {
+      range.push(i);
+    }
+
+    // Always include first page
+    if (left > 1) {
+      rangeWithDots.push(1);
+      if (left > 2) rangeWithDots.push("...");
+    }
+
+    rangeWithDots.push(...range);
+
+    // Always include last page
+    if (right < totalPages) {
+      if (right < totalPages - 1) rangeWithDots.push("...");
+      rangeWithDots.push(totalPages);
+    }
+
+    return rangeWithDots;
+  };
+
   // Sorting handler
   const handleSort = (key) => {
     setCurrentPage(1);
@@ -242,26 +276,94 @@ function StaffTable({ staff, resetKey, onSortingChange }) {
         </table>
       </div>
 
-      {/* PAGINATION */}
-      {totalPages > 1 && (
-        <div className="flex justify-center gap-2">
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-            (page) => (
+      {/* CONTROL FOOTER */}
+      <div className="bg-white border rounded shadow-sm px-4 py-3">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between text-sm text-gray-600">
+
+          {/* INFO */}
+          <div className="font-normal text-center md:text-left leading-snug">
+            Showing
+            {" "}
+            <span className="text-gray-900 font-medium">{showingFrom}</span>
+            {" – "}
+            <span className="text-gray-900 font-medium">{showingTo}</span>
+            {" of "}
+            <span className="text-gray-900 font-medium">{totalItems}</span>
+            {" staff"}
+
+            {totalAll > totalItems && (
+              <span className="block md:inline md:ml-2 text-gray-400 font-normal">
+                (filtered from {totalAll})
+              </span>
+            )}
+          </div>
+
+          {/* PAGINATION */}
+          {totalPages > 1 && (
+            <div className="flex flex-wrap justify-center md:justify-end items-center gap-1">
+
+              {/* FIRST */}
               <button
-                key={page}
-                onClick={() => setCurrentPage(page)}
-                className={`px-3 py-1 rounded border text-sm ${
-                  page === currentPage
-                    ? "bg-primary text-white"
-                    : "bg-white hover:bg-gray-100"
-                }`}
+                onClick={() => setCurrentPage(1)}
+                disabled={currentPage === 1}
+                className="px-2 py-1 border rounded bg-white hover:bg-gray-100 disabled:opacity-40"
               >
-                {page}
+                {"<<"}
               </button>
-            )
+
+              {/* PREVIOUS */}
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                disabled={currentPage === 1}
+                className="px-2 py-1 border rounded bg-white hover:bg-gray-100 disabled:opacity-40"
+              >
+                {"<"}
+              </button>
+
+              {/* PAGE NUMBERS */}
+              {getVisiblePages().map((page, index) =>
+                page === "..." ? (
+                  <span key={index} className="px-2 text-gray-400 select-none">
+                    ...
+                  </span>
+                ) : (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`px-3 py-1 rounded border transition ${
+                      page === currentPage
+                        ? "bg-primary text-white border-primary"
+                        : "bg-white hover:bg-gray-100"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                )
+              )}
+
+              {/* NEXT */}
+              <button
+                onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="px-2 py-1 border rounded bg-white hover:bg-gray-100 disabled:opacity-40"
+              >
+                {">"}
+              </button>
+
+              {/* LAST */}
+              <button
+                onClick={() => setCurrentPage(totalPages)}
+                disabled={currentPage === totalPages}
+                className="px-2 py-1 border rounded bg-white hover:bg-gray-100 disabled:opacity-40"
+              >
+                {">>"}
+              </button>
+
+            </div>
           )}
+
         </div>
-      )}
+      </div>
     </div>
   );
 }

@@ -52,9 +52,9 @@ function Login({ setIsLoggedIn }) {
         </h2>
 
         {error && (
-          <p className="text-red-600 mb-3 text-center text-sm">
+          <div className="mb-4 border border-red-200 bg-red-50 text-red-700 text-sm text-center px-4 py-2 rounded-md">
             {error}
-          </p>
+          </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
